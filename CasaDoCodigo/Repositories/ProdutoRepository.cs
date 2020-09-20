@@ -24,7 +24,19 @@ namespace CasaDoCodigo.Repositories
             {
                 if (!dbSet.Where(p => p.Codigo == livro.Codigo).Any())
                 {
-                    dbSet.Add(new Produto(livro.Codigo, livro.Nome, livro.Preco));
+                    var categoriaRepository = new CategoriaRepository(contexto);
+
+                    var categoria = categoriaRepository.GetCategoria(livro.Categoria);
+
+                    if (categoria == null)
+                    {
+                        await categoriaRepository.SaveCategoria(livro.Categoria);
+
+                        // throw new AggregateException($"A categoria não existe");
+
+                    }
+
+                    dbSet.Add(new Produto(livro.Codigo, livro.Nome, livro.Preco, categoria));
                 }
             }
             await contexto.SaveChangesAsync();
