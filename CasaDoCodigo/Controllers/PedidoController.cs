@@ -24,6 +24,17 @@ namespace CasaDoCodigo.Controllers
             this.itemPedidoRepository = itemPedidoRepository;
         }
 
+        public IActionResult BuscaProdutos()
+        {
+            var listaProdutos = produtoRepository.GetProdutos().ToList();
+            
+            var lista = listaProdutos.GroupBy(
+                i => i.Categoria,
+                (key, produto) => new ListaProdutosViewModel(key?.Nome, produto.ToList()) 
+                ).ToList();
+
+            return View(lista);
+        }
         public IActionResult Carrossel()
         {
             return View(produtoRepository.GetProdutos());

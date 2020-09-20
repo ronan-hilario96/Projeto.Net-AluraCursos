@@ -15,7 +15,7 @@ namespace CasaDoCodigo.Repositories
 
         public IList<Produto> GetProdutos()
         {
-            return dbSet.ToList();
+            return dbSet.Include(i => i.Categoria).ToList();
         }
 
         public async Task SaveProdutos(List<Livro> livros)
