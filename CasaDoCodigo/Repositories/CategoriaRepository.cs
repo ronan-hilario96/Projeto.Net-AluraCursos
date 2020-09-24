@@ -12,14 +12,14 @@ namespace CasaDoCodigo.Repositories
         public CategoriaRepository(ApplicationContext contexto) : base(contexto)
         {
         }
-        public IList<Categoria> GetCategoria()
+        public async Task<IList<Categoria>> GetCategoria()
         {
-            return dbSet.ToList();
+            return await dbSet.ToListAsync();
         }
 
-        public Categoria GetCategoria(string nomeCategoria)
+        public async Task<Categoria> GetCategoria(string nomeCategoria)
         {
-            return dbSet.Where(x => x.Nome == nomeCategoria).FirstOrDefault();
+            return await dbSet.Where(x => x.Nome == nomeCategoria).FirstOrDefaultAsync();
         }
 
         public async Task SaveCategoria(string nomeCategoria)
@@ -36,6 +36,23 @@ namespace CasaDoCodigo.Repositories
             dbSet.Add(categoria);
 
             await contexto.SaveChangesAsync();
+        }
+
+        public async Task<bool> Validar(string nomeCategoria)
+        {
+            var categoria = await GetCategoria(nomeCategoria);
+
+            if (categoria == null)
+            {
+#if DEBUG
+                await SaveCategoria(nomeCategoria);
+                return true;
+#endif
+                throw new AggregateException($"A categoria não existe -> {nomeCategoria}");
+            }
+
+            return true;
+
         }
     }
 }

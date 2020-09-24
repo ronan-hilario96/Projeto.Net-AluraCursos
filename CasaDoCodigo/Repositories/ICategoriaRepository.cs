@@ -7,7 +7,8 @@ namespace CasaDoCodigo.Repositories
     public interface ICategoriaRepository
     {
         Task SaveCategoria(string nomeCategoria);
-        IList<Categoria> GetCategoria();
-        Categoria GetCategoria(string nomeCategoria);
+        Task<IList<Categoria>> GetCategoria();
+        Task<Categoria> GetCategoria(string nomeCategoria);
+        Task<bool> Validar(string nomeCategoria);
     }
 }

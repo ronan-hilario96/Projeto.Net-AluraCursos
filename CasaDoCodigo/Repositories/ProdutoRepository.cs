@@ -9,13 +9,31 @@ namespace CasaDoCodigo.Repositories
 {
     public class ProdutoRepository : BaseRepository<Produto>, IProdutoRepository
     {
-        public ProdutoRepository(ApplicationContext contexto) : base(contexto)
+        private ICategoriaRepository _categoriaRepository;
+        public ProdutoRepository(ApplicationContext contexto, ICategoriaRepository categoriaRepository) : base(contexto)
         {
+            _categoriaRepository = categoriaRepository;
         }
 
         public IList<Produto> GetProdutos()
         {
             return dbSet.Include(i => i.Categoria).ToList();
+        }
+        public async Task<IList<Produto>> GetProdutos(string pesquisa)
+        {
+            IList<Produto> retorno;
+
+            if(!string.IsNullOrEmpty(pesquisa))
+            {
+                retorno = await dbSet.Include(i => i.Categoria)
+                        .Where(x => x.Nome.Contains(pesquisa) || x.Categoria.Nome.Contains(pesquisa))
+                        .ToListAsync();
+            } else
+            {
+                retorno = await dbSet.Include(i => i.Categoria).ToListAsync();
+            }
+
+            return retorno;
         }
 
         public async Task SaveProdutos(List<Livro> livros)
@@ -24,19 +42,14 @@ namespace CasaDoCodigo.Repositories
             {
                 if (!dbSet.Where(p => p.Codigo == livro.Codigo).Any())
                 {
-                    var categoriaRepository = new CategoriaRepository(contexto);
+                    var categoriaValida = await _categoriaRepository.Validar(livro.Categoria);
 
-                    var categoria = categoriaRepository.GetCategoria(livro.Categoria);
-
-                    if (categoria == null)
+                    if (categoriaValida)
                     {
-                        await categoriaRepository.SaveCategoria(livro.Categoria);
+                        var obtemCategoria = await _categoriaRepository.GetCategoria(livro.Categoria);
 
-                        // throw new AggregateException($"A categoria não existe");
-
+                        dbSet.Add(new Produto(livro.Codigo, livro.Nome, livro.Preco, obtemCategoria));
                     }
-
-                    dbSet.Add(new Produto(livro.Codigo, livro.Nome, livro.Preco, categoria));
                 }
             }
             await contexto.SaveChangesAsync();
