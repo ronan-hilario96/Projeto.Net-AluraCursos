@@ -37,22 +37,5 @@ namespace CasaDoCodigo.Repositories
 
             await contexto.SaveChangesAsync();
         }
-
-        public async Task<bool> Validar(string nomeCategoria)
-        {
-            var categoria = await GetCategoria(nomeCategoria);
-
-            if (categoria == null)
-            {
-#if DEBUG
-                await SaveCategoria(nomeCategoria);
-                return true;
-#endif
-                throw new AggregateException($"A categoria não existe -> {nomeCategoria}");
-            }
-
-            return true;
-
-        }
     }
 }

@@ -42,14 +42,16 @@ namespace CasaDoCodigo.Repositories
             {
                 if (!dbSet.Where(p => p.Codigo == livro.Codigo).Any())
                 {
-                    var categoriaValida = await _categoriaRepository.Validar(livro.Categoria);
+                    var categoria = await _categoriaRepository.GetCategoria(livro.Categoria);
 
-                    if (categoriaValida)
+                    if (categoria == null)
                     {
-                        var obtemCategoria = await _categoriaRepository.GetCategoria(livro.Categoria);
+                        await _categoriaRepository.SaveCategoria(livro.Categoria);
 
-                        dbSet.Add(new Produto(livro.Codigo, livro.Nome, livro.Preco, obtemCategoria));
+                        categoria = await _categoriaRepository.GetCategoria(livro.Categoria);
                     }
+
+                    dbSet.Add(new Produto(livro.Codigo, livro.Nome, livro.Preco, categoria));
                 }
             }
             await contexto.SaveChangesAsync();

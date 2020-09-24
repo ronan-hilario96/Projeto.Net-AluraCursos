@@ -27,6 +27,12 @@
 
 @foreach (var Categorias in Model.Produtos)
 {
+<script>
+
+        console.log("@Categorias.First().Categoria?.Nome");
+
+</script>
+
     <h3>@Categorias.First().Categoria?.Nome</h3>
 
     <div id="my-carousel-@Categorias.First().Categoria?.Nome?.GetHashCode()" class="carousel slide" data-ride="carousel">

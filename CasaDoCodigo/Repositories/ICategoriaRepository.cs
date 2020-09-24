@@ -9,6 +9,5 @@ namespace CasaDoCodigo.Repositories
         Task SaveCategoria(string nomeCategoria);
         Task<IList<Categoria>> GetCategoria();
         Task<Categoria> GetCategoria(string nomeCategoria);
-        Task<bool> Validar(string nomeCategoria);
     }
 }
